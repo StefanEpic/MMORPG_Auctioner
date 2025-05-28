@@ -42,15 +42,16 @@ def run(work_url: str):
             td_list = row.find_elements(By.TAG_NAME, 'td')
             item_name = td_list[1].text
             quantity = td_list[0].text if td_list[0].text else "1"
-            materials_hrefs = [i.get_attribute('href') for i in td_list[2].find_elements(By.TAG_NAME, 'a')]
-            materials_names = [" ".join(unquote(i.split('/')[-1]).split('-')).capitalize() for i in materials_hrefs]
-            materials_col = [i.text for i in td_list[2].find_elements(By.TAG_NAME, 'span')]
-            if not materials_col:
-                materials_col = ["1" for _ in range(len(materials_names))]
             materials = dict()
-            for i in zip(materials_names, materials_col):
-                materials[i[0]] = i[1]
-
+            div_list = td_list[2].find_elements(By.TAG_NAME, 'div')
+            for div in div_list:
+                material_name = div.find_element(By.TAG_NAME, 'a').get_attribute('href')
+                material_name = " ".join(unquote(material_name.split('/')[-1]).split('-')).capitalize()
+                try:
+                    material_col = div.find_element(By.TAG_NAME, 'span').text
+                except:
+                    material_col = "1"
+                materials[material_name] = material_col
             r = dict()
             r['Количество'] = quantity
             r['Материалы'] = materials
