@@ -1,14 +1,30 @@
 import json
+import time
 
 from utils import run
 
-with open(f'engineering.json', 'r', encoding='utf-8') as new_file:
-    data = new_file.read()
-    data = json.loads(data)
+urls = [
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;50',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;100',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;150',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;200',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;250',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;300',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;350',
+    'https://www.wowhead.com/wotlk/ru/skill=197/портняжное-дело#recipes;400',
+]
 
-url = 'https://www.wowhead.com/wotlk/ru/skill=202/инженерное-дело#recipes:300'
-results = run(url)
+for url in urls:
+    with open('tailoring.json', 'r', encoding='utf-8') as new_file:
+        data = new_file.read()
+        data = json.loads(data)
 
-with open(f'engineering.json', 'w', encoding='utf-8') as new_file:
-    data.update(results)
-    new_file.write(json.dumps(data, ensure_ascii=False, indent=4))
+    print(url)
+    results = run(url)
+
+    with open('tailoring.json', 'w', encoding='utf-8') as new_file:
+        data.update(results)
+        new_file.write(json.dumps(data, ensure_ascii=False, indent=4))
+
+    time.sleep(5)
