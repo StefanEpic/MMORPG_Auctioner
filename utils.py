@@ -1,9 +1,28 @@
+import re
+from typing import Dict
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from urllib.parse import unquote
 from selenium.webdriver.common.by import By
 
 PROXY = "192.168.17.89:3128"
+
+
+def correct_item_name(item_name: str) -> str:
+    item_name = re.sub(r'\(\d+\)', '', item_name[1:-1])
+    return item_name.strip()
+
+
+def create_items_price_dict(raw_text: str) -> Dict[str, int]:
+    rows = raw_text.split('\n')
+    items = dict()
+    for r in rows[1:]:
+        split_row = r.split(',')
+        price = int(split_row[0])
+        name = correct_item_name(",".join(split_row[1:-2]))
+        items[name] = price
+    return items
 
 
 def get_driver(download_dir: str = 'temp') -> webdriver:
