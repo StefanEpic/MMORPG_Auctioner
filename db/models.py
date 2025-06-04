@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import pytz
-from sqlalchemy import String, ForeignKey, DateTime
+from sqlalchemy import String, ForeignKey, DateTime, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 
 
@@ -12,7 +12,13 @@ class Base(DeclarativeBase):
 
 class Items(Base):
     __tablename__ = 'items'
-    name: Mapped[str] = mapped_column(String(300), unique=True, nullable=False)
+    __table_args__ = (
+        UniqueConstraint('name', 'rarity', 'type', 'level', name='uq_items_name_rarity_type_level'),
+    )
+    name: Mapped[str] = mapped_column(String(300), nullable=False)
+    rarity: Mapped[str] = mapped_column(String(50), nullable=True)
+    type: Mapped[str] = mapped_column(String(50), nullable=True)
+    level: Mapped[int] = mapped_column(nullable=True)
 
     def __str__(self):
         return self.name

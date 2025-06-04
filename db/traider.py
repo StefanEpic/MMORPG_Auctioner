@@ -3,7 +3,7 @@ from db.repositories import auctioneer
 
 class Trader:
     @staticmethod
-    def print_craft(min_profit: int, max_profit: int) -> None:
+    def print_craft(min_profit: int, max_profit: int):
         recipes_for_craft = auctioneer.get_recipes_for_craft()
         for r in recipes_for_craft:
             if min_profit < r['Текущая выгода'] < max_profit and r['Текущая выгода'] > r['Средняя выгода']:
@@ -14,9 +14,10 @@ class Trader:
                 print('\t', 'Материалы:')
                 for m in r['Материалы']:
                     print('\t', '\t', f"{m['Название']}: {m['Количество']} шт по {m['Цена']} г")
+        return recipes_for_craft
 
     @staticmethod
-    def print_buy(min_profit: int, max_profit: int) -> None:
+    def print_buy(min_profit: int, max_profit: int):
         items = auctioneer.get_price_differences()
         for i in items:
             if min_profit < i['Ниже средней цены на'] < max_profit:
@@ -24,6 +25,7 @@ class Trader:
                 print('\t', 'Выгода:', i['Ниже средней цены на'], 'г')
                 print('\t', 'Цена:', i['Последняя цена'], 'г')
                 print('\t', 'Средняя:', i['Средняя цена за месяц'], 'г')
+        return items
 
 
 trader = Trader()

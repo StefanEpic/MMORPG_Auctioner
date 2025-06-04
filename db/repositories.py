@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from operator import and_
-from typing import List, Tuple, Optional, Dict
+from typing import List, Tuple, Optional, Dict, Union
 
 import pytz
 from sqlalchemy import create_engine, func, select, desc
@@ -89,6 +89,18 @@ class Auctioneer(DatabaseManager):
             return super()._create(model=Items, name=name)
         except Exception as e:
             print(e)
+
+    def add_items_bulk(self, items: List[Dict[str, Union[str, int]]]):
+        session = self.Session()
+        try:
+            items_for_bulk = [Items(name=i['name'], rarity=i['rarity'], type=i['type'], level=i['level']) for i in items]
+            session.add_all(items_for_bulk)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            print(f"Ошибка при массовом добавлении предметов: {e}")
+        finally:
+            session.close()
 
     def get_item_price(self, item_name: str) -> dict:
         session = self.Session()
@@ -229,7 +241,7 @@ class Auctioneer(DatabaseManager):
                 )
 
                 if last_price and avg_price:
-                    price_diff = avg_price - last_price[0]
+                    price_diff = last_price[0] - avg_price
                     results.append({
                         'Название': item.name,
                         'Последняя цена': round(last_price[0] / 10000, 2),
@@ -238,7 +250,7 @@ class Auctioneer(DatabaseManager):
                     })
 
             # Сортируем по абсолютной разнице (по убыванию)
-            results.sort(key=lambda x: abs(x['Ниже средней цены на']), reverse=True)
+            results.sort(key=lambda x: abs(x['Ниже средней цены на']))
             return results
         finally:
             session.close()
@@ -353,7 +365,7 @@ class Auctioneer(DatabaseManager):
                 })
 
         # Сортируем по убыванию прибыли
-        profitable_recipes.sort(key=lambda x: x['Текущая выгода'], reverse=True)
+        profitable_recipes.sort(key=lambda x: x['Текущая выгода'])
 
         return profitable_recipes
 
